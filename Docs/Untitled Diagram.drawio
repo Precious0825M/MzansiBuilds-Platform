@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="uDNR0ykO_wuGI4q602Hc">
-    <mxGraphModel dx="1903" dy="991" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1885" dy="991" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -458,7 +458,7 @@
         <mxCell id="WF6y42ZrCOq_koNAOvdy-2" parent="WF6y42ZrCOq_koNAOvdy-1" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="+pending&lt;br&gt;&lt;div&gt;+ accepted&lt;/div&gt;&lt;div&gt;+rejected&lt;/div&gt;" vertex="1">
           <mxGeometry height="70" width="160" y="50" as="geometry" />
         </mxCell>
-        <mxCell id="WF6y42ZrCOq_koNAOvdy-3" edge="1" parent="1" source="WF6y42ZrCOq_koNAOvdy-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="fcdIt-813CE8N1sbuY0X-80">
+        <mxCell id="WF6y42ZrCOq_koNAOvdy-3" edge="1" parent="1" source="WF6y42ZrCOq_koNAOvdy-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;dashed=1;dashPattern=1 1;endArrow=none;endFill=0;" target="fcdIt-813CE8N1sbuY0X-80">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="890" y="525" />
