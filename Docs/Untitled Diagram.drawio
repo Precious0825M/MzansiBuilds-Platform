@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="uDNR0ykO_wuGI4q602Hc">
-    <mxGraphModel dx="1414" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1903" dy="991" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -164,7 +164,7 @@
             <mxRectangle height="30" width="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fcdIt-813CE8N1sbuY0X-39" parent="fcdIt-813CE8N1sbuY0X-37" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="stage(ENUM: )" vertex="1">
+        <mxCell id="fcdIt-813CE8N1sbuY0X-39" parent="fcdIt-813CE8N1sbuY0X-37" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="stage(ENUM_Stage: )" vertex="1">
           <mxGeometry height="30" width="150" x="30" as="geometry">
             <mxRectangle height="30" width="150" as="alternateBounds" />
           </mxGeometry>
@@ -208,7 +208,7 @@
             <mxRectangle height="30" width="150" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fcdIt-813CE8N1sbuY0X-49" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="ENUM" vertex="1">
+        <mxCell id="fcdIt-813CE8N1sbuY0X-49" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="ENUM_Stage" vertex="1">
           <mxGeometry height="120" width="160" x="605" y="710" as="geometry" />
         </mxCell>
         <mxCell id="fcdIt-813CE8N1sbuY0X-50" parent="fcdIt-813CE8N1sbuY0X-49" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="+Planning&lt;br&gt;+Development&lt;br&gt;+Testing&lt;div&gt;+Completed&lt;/div&gt;" vertex="1">
@@ -345,7 +345,7 @@
             <mxRectangle height="30" width="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="fcdIt-813CE8N1sbuY0X-82" parent="fcdIt-813CE8N1sbuY0X-80" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="status" vertex="1">
+        <mxCell id="fcdIt-813CE8N1sbuY0X-82" parent="fcdIt-813CE8N1sbuY0X-80" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;whiteSpace=wrap;html=1;" value="status(ENUM_State)" vertex="1">
           <mxGeometry height="30" width="180" x="30" as="geometry">
             <mxRectangle height="30" width="180" as="alternateBounds" />
           </mxGeometry>
@@ -451,6 +451,22 @@
         </mxCell>
         <mxCell id="fcdIt-813CE8N1sbuY0X-108" edge="1" parent="1" source="fcdIt-813CE8N1sbuY0X-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=1 1;endArrow=none;endFill=0;" target="fcdIt-813CE8N1sbuY0X-37">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WF6y42ZrCOq_koNAOvdy-1" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="ENUM_State" vertex="1">
+          <mxGeometry height="120" width="160" x="440" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="WF6y42ZrCOq_koNAOvdy-2" parent="WF6y42ZrCOq_koNAOvdy-1" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="+pending&lt;br&gt;&lt;div&gt;+ accepted&lt;/div&gt;&lt;div&gt;+rejected&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="WF6y42ZrCOq_koNAOvdy-3" edge="1" parent="1" source="WF6y42ZrCOq_koNAOvdy-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="fcdIt-813CE8N1sbuY0X-80">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="890" y="525" />
+              <mxPoint x="890" y="435" />
+            </Array>
+            <mxPoint x="630.0099999999999" y="539.9999999999999" as="sourcePoint" />
+            <mxPoint x="867.93" y="475.34000000000003" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
