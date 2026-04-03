@@ -14,6 +14,7 @@ Represents a developer using the platform.
 + eamil (must be unique)
 + password (must be harshed)
 + bio
++ is_deleted -- Incase user wants to delete their account
 + created_at (Might be used for rporting later)
 + updated_at (Also for future reports) -- Can help us remind the user when they last changed their information
 
@@ -29,6 +30,7 @@ Reperesents a developer's project.
 + description
 + stage(ENUM: Planing, Development, Testing, Completed) -- This to keep track of where the project is at in its lifespan.
 + support_needed -- The developer can use this to let others know he needs help.
++ is_deleted
 + created_at
 + updated_at
 
@@ -42,6 +44,7 @@ Represents progress updates or milestones for a project.
 + user_id (Foreign Key) -- who made the update
 + content -- What exactly was the update about
 + created_at -- tells us when the update was made
++ is_deleted
 
 
 ### 4. Comment
@@ -54,6 +57,7 @@ Represents user interaction on updates, bringing a little siociality to the plat
 + user_id (Foreign Key) -- who made the comment
 + content -- what was the comment 
 + created_at -- when was the comment made
++ is_deleted
 
 
 ### 5. CollaborationRequest
@@ -65,7 +69,8 @@ Represents a request by a user to collaborate on a project or to offer the neede
 + project_id (Foreign Key) -- Tells us which project
 + user_id (Foreign Key) -- Tells us who wants to collaborate (We already know who owns the project)
 + message -- User can give details on how they want to collaborate 
-+ status(ENUM: Pending, Accepted, Rejected) -- Owner can decide if they want to accept or not 
++ status(ENUM: Pending, Accepted, Rejected) -- Owner can decide if they want to accept or not
++ is_deleted -- Incase user wants to lower their hand for collaboration 
 + created_at -- Tells us when was the request made(We can use this to remind owners after certain periods) 
 + Update_at -- This will tell us when the owner actually responded
 
