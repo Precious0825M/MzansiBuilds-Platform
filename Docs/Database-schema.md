@@ -11,8 +11,8 @@ Represents a developer using the platform.
 
 + user_id (Primary key)
 + name
-+ eamil (must be unique)
-+ password (must be harshed)
++ email (must be unique)
++ password (must be hashed)
 + bio
 + is_deleted -- Incase user wants to delete their account
 + created_at (Might be used for rporting later)
@@ -20,7 +20,7 @@ Represents a developer using the platform.
 
 
 ### 2. Project
-Reperesents a developer's project.
+Represents a developer's project.
 
 #### Fields:
 
@@ -48,7 +48,7 @@ Represents progress updates or milestones for a project.
 
 
 ### 4. Comment
-Represents user interaction on updates, bringing a little siociality to the platform
+Represents user interaction on updates, bringing a little sociality to the platform
 
 #### Fields:
 
