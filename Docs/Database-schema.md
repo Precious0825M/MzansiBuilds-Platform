@@ -1,6 +1,6 @@
 # MzansiBuilds- Database Schema Design
 
-This document outlines the design choices for the MzansiBuilds database. We prioritize simplicity while addressing all requirements, and the design considers future scalability.
+This document outlines the design for the MzansiBuilds database. We prioritize simplicity while addressing all requirements, and the design considers future scalability.
 ##
 ## Entities
 
@@ -69,5 +69,13 @@ Represents a request by a user to collaborate on a project or to offer the neede
 + created_at -- Tells us when was the request made(We can use this to remind owners after certain periods) 
 + Update_at -- This will tell us when the owner actually responded
 
-
-
+### Relationships
++ A User can have many Projects
++ A Project belongs to one User
++ A Project can have many Updates
++ An Update belongs to one Project
++ A User can create many Updates
++ An Update can have many Comments
++ A User can create many Comments
++ A Project can have many CollaborationRequests
++ A User can create many CollaborationRequests
