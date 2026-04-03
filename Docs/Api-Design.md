@@ -30,7 +30,7 @@ Retrieves the curent logged in user.
 
 ## 2. User APIs
 
-### GET /api/users/
+### GET /api/users/:id
 Fetches a specific user's profile.
 
 #### How 
@@ -60,26 +60,26 @@ Retrieve all projects.
 + Returns a list of projects
 + Used to display available projects across the platform
 
-### GET /api/projects/
+### GET /api/projects/:id
 Retrieve a single project.
 
 #### How
 + Fetches detailed information about one project
 
-### GET /api/projects/user/
+### GET /api/projects/user/:user_id
 Retrieve projects created by a specific user.
 
 #### How
 + Returns projects filtered using user_id
 
 
-### PUT /api/projects/
+### PUT /api/projects/:proj_id
 Update a project.
 
 #### How
 + Allows project owner to edit: title, description, stage, support_needed
 
-### DELETE /api/projects/
+### DELETE /api/projects/:proj_id
 Delete a project.
 
 #### How
@@ -101,14 +101,14 @@ Retrieve all updates (For Live Feed).
 + Returns updates across all projects
 + Ordered by created_at (latest first)
 
-### GET /api/projects//updates
+### GET /api/projects/:proj_id/updates
 Retrieve updates for a specific project.
 
 #### How
 + Filters updates using project_id
 + Displays project-specific progress history
 
-### DELETE /api/updates/
+### DELETE /api/updates/:update_id
 Delete an update.
 
 #### How 
@@ -124,13 +124,13 @@ For adding a comment to an update.
 + Inserts a record into the Comment table
 + Links comment to update_id and user_id
 
-### GET /api/updates//comments
+### GET /api/updates/:update_id/comments
 Retrieve comments for a specific update.
 
 #### How
 + Returns all comments linked to an update
 
-### DELETE /api/comments/
+### DELETE /api/comments/:com_id
 Delete a comment.
 
 #### How
@@ -147,13 +147,13 @@ Raise a collaboration request (raise a hand).
 + Links project_id(The project they want to collaborate on) and user_id(The user who wishes to collaborate)
 + Stores optional message explaining how they will collaborate
 
-### GET /api/projects//collaborations
+### GET /api/projects/:proj_id/collaborations
 View collaboration requests for a project.
 
 #### How
 + Retrieves all requests for a specific project -- Allows project owner to review requests
 
-### PATCH /api/collaborations/
+### PATCH /api/collaborations/:collab_ID
 Update collaboration request status.
 
 #### How
