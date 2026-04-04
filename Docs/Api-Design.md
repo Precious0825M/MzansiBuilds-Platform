@@ -8,7 +8,7 @@ This document outlines the API structure for the MzansiBuilds platform. The API 
 This is meant to register new users.
 
 #### How
-+ It accepts user details (name,email,password)
++ It accepts user details (name,email,password, ...)
 + Hashes the password before storing
 + creates a new record in the User table
 
