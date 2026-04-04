@@ -2,13 +2,16 @@
 MzansiBuilds API Application
 """
 
-from fastapi import FastAPI, HTTPException
-import hmac
-import hashlib
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
+from fastapi import FastAPI, HTTPException, Depends
+import os
 from app.db.database import DatabaseConfig
-from app.schemas.user import UserCreate, UserRegisterResponse
+from app.schemas.user import UserCreate, UserRegisterResponse, UserLogin, UserUpdate, UserResponse
+from app.core.security import hash_password, verify_password, create_access_token
+from app.core.dependencies import get_current_user
+from typing import Dict
 
 app = FastAPI(title="MzansiBuilds API", version="1.0.0")
 
@@ -41,15 +44,9 @@ async def root():
     return {"message": "MzansiBuilds API is running"}
 
 
-def hash_password(password: str) -> str:
-    """Hash password using HS256 (HMAC SHA-256) with SECRET_KEY."""
-    secret_key = os.getenv('SECRET_KEY', 'default_secret')
-    return hmac.new(
-        secret_key.encode('utf-8'),
-        password.encode('utf-8'),
-        hashlib.sha256
-    ).hexdigest()
-
+# ============================================================================
+# User Authentication and Profile Endpoints
+# ============================================================================
 
 @app.post("/api/auth/register", response_model=UserRegisterResponse)
 async def register_user(user_data: UserCreate):
@@ -63,13 +60,13 @@ async def register_user(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hash the password using HS256
+    # Hash the password using PBKDF2 with SHA-256
     hashed_password = hash_password(user_data.password)
 
     # Insert new user
     success = db.execute_update(
         """
-        INSERT INTO users (name, email, password, bio)
+        INSERT INTO users (name, email, password_hash, bio)
         VALUES (%s, %s, %s, %s)
         """,
         (user_data.name, user_data.email, hashed_password, user_data.bio)
@@ -87,3 +84,36 @@ async def register_user(user_data: UserCreate):
         message="User registered successfully",
         user_id=user_id
     )
+    
+
+@app.post("/api/auth/login")
+async def login_user(user_data: UserLogin):
+    """login user"""
+    # Fetch user by email
+    user = db.execute_query(
+        "SELECT user_id, name, email, password_hash FROM users WHERE email = %s",
+        (user_data.email,)
+    )
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    user = user[0]  # since execute_query returns list of dicts
+    
+    # Verify password
+    if not verify_password(user_data.password, user['password_hash']):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Create access token
+    access_token = create_access_token(
+        data={"user_id": user["user_id"]}
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+@app.get("/api/users/me", response_model=UserResponse)
+async def get_current_user_profile(current_user: dict = Depends(get_current_user)):
+    """Get the current authenticated user's profile."""
+    return current_user
+
