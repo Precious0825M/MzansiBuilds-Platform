@@ -39,8 +39,19 @@ from app.schemas.celebration import CelebrationResponse
 from app.core.security import hash_password, verify_password, create_access_token
 from app.core.dependencies import get_current_user
 from typing import Dict
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="MzansiBuilds API", version="1.0.0")
+
+app.add_middleware(
+     CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 db = DatabaseConfig()
 

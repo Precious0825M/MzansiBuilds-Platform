@@ -1,0 +1,118 @@
+/* ─── ROOT ───────────────────────────────── */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0fdf4;
+    padding: 20px;
+    font-family: system-ui, sans-serif;
+}
+
+/* ─── CARD ───────────────────────────────── */
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid #dcfce7;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+}
+
+/* ─── LOGO ───────────────────────────────── */
+.auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo h1 {
+    margin: 10px 0 4px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.auth-logo p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Wrap form elements */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Inputs */
+.auth-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #d1fae5;
+    background: #f9fafb;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    transition: 0.2s;
+    box-sizing: border-box; 
+}
+
+.auth-input:focus {
+    border-color: #16a34a;
+    background: #ffffff;
+     color: #111827;
+}
+
+/* Button */
+.auth-btn {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #16a34a;
+    background: #16a34a;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.auth-btn:hover {
+    background: #15803d;
+}
+
+/* ─── ERROR ─────────────────────────────── */
+.auth-error {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+/* ─── SWITCH TEXT ───────────────────────── */
+.auth-switch {
+    margin-top: 16px;
+    font-size: 13px;
+    text-align: center;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.auth-switch span {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+/* ─── TITLE ─────────────────────────────── */
+.auth-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+    text-align: center;
+}
+.auth-input::placeholder {
+    color: #9ca3af;
+}
