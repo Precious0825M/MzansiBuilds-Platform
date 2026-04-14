@@ -30,9 +30,13 @@ export default function Login() {
         <div className="min-h-screen flex items-center justify-center bg-green-50 px-5 font-system">
             <div className="w-full max-w-md bg-white rounded-3xl p-8 border border-gray-300 shadow-lg">
 
-                <div className="text-center mb-7">
-                    <h1 className="text-2xl font-black text-gray-900"> MzansiBuilds</h1>
-                    q                    <p className="text-sm text-gray-500 mt-1">Build in public. Ship together.</p>
+                <div className="text-center mb-7 ">
+                    <h1 className="inline-block text-2xl font-black text-green-900  px-5 py-2rounded-2xl">
+                        MzansiBuilds
+                    </h1>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Build in public. Ship together.
+                    </p>
                 </div>
 
                 <h2 className="text-lg font-bold text-gray-900 mb-5">Login</h2>

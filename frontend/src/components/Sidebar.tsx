@@ -42,7 +42,7 @@ export default function Sidebar() {
                     className="text-2xl font-black text-green-600 cursor-pointer hover:text-green-700 transition-colors"
                     onClick={() => navigate('/dashboard')}
                 >
-                    MzansBuilds
+                    MzansiBuilds
                 </h1>
                 <p className="text-xs text-gray-500 mt-1">Build Public</p>
             </div>
