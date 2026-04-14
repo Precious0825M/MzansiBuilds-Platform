@@ -191,6 +191,7 @@ export default function ProjectDetail() {
                         </div>
                         {isOwner ? (
                             <select
+                                aria-label="Project stage"
                                 value={project.stage}
                                 onChange={(e) => handleUpdateStage(e.target.value)}
                                 disabled={updatingStage}

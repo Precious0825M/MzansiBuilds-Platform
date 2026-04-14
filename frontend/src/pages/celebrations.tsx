@@ -74,7 +74,7 @@ export default function Celebrations() {
                                     <div className="mb-4">
                                         <p className="text-xs font-semibold text-gray-700 mb-2">Collaborators ({project.collaborators.length})</p>
                                         <div className="flex flex-wrap gap-2">
-                                            {project.collaborators.map(collab => (
+                                            {project.collaborators.map((collab: { user_id: string; name: string }) => (
                                                 <div key={collab.user_id} className="bg-purple-100 text-purple-700 rounded-full px-3 py-1 text-xs font-medium">
                                                     {collab.name}
                                                 </div>
@@ -87,7 +87,7 @@ export default function Celebrations() {
                                     <div className="space-y-3 mb-4">
                                         <p className="text-xs font-semibold text-gray-700">Recent Comments ({project.comments.length})</p>
                                         <div className="space-y-2 max-h-48 overflow-y-auto">
-                                            {project.comments.map(comment => (
+                                            {project.comments.map((comment: { com_id: string; author_name: string; content: string }) => (
                                                 <div key={comment.com_id} className="bg-white p-3 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow ml-2">
                                                     <div className="flex gap-2">
                                                         <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
