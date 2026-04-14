@@ -102,6 +102,12 @@ npm install
 npm run dev
 ```
 
+### Running Seed_data --to get data for presentation
+```bash
+cd backend
+python seed_data.py
+```
+
 Visit `http://localhost:5173` to access the platform (backend runs on `http://localhost:8000`).
 
 ## Documentation
