@@ -102,7 +102,7 @@ async def register_user(user_data: UserCreate):
     hashed_password = hash_password(user_data.password)
 
     # Insert new user
-    success = db.execute_update(
+    user_id = db.execute_insert(
         """
         INSERT INTO users (name, email, password_hash, bio)
         VALUES (%s, %s, %s, %s)
@@ -110,13 +110,8 @@ async def register_user(user_data: UserCreate):
         (user_data.name, user_data.email, hashed_password, user_data.bio)
     )
 
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to create user")
-
-    # Get the new user ID
-    user_id = db.get_last_insert_id()
     if user_id is None:
-        raise HTTPException(status_code=500, detail="Failed to retrieve user ID")
+        raise HTTPException(status_code=500, detail="Failed to create user")
 
     return UserRegisterResponse(
         message="User registered successfully",
@@ -153,6 +148,11 @@ async def login_user(user_data: UserLogin):
 @app.get("/api/users/me", response_model=UserResponse)
 async def get_current_user_profile(current_user: dict = Depends(get_current_user)):
     """Get the current authenticated user's profile."""
+    return current_user
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def get_auth_me(current_user: dict = Depends(get_current_user)):
+    """Get the current authenticated user's profile (alias for /api/users/me)."""
     return current_user
 
 # ============================================================================
@@ -227,7 +227,7 @@ async def create_project(project_data: ProjectCreate, current_user: dict = Depen
     INSERT INTO projects (user_id, title, description, stage, support_needed)
     VALUES (%s, %s, %s, %s, %s)
     """
-    success = db.execute_update(
+    proj_id = db.execute_insert(
         query,
         (current_user["user_id"],
          project_data.title,
@@ -235,16 +235,15 @@ async def create_project(project_data: ProjectCreate, current_user: dict = Depen
          project_data.stage,
          project_data.support_needed)
     )
-    if not success:
+    
+    if proj_id is None:
         raise HTTPException(status_code=500, detail="Failed to create project")
     
-    proj_id = db.get_last_insert_id()
     created_project = db.execute_query(
         "SELECT * FROM projects WHERE proj_id = %s AND is_deleted = 0",
         (proj_id,)
     )
     if not created_project or len(created_project) == 0:
-        """ This should never happen if the insert was successful, but we check just in case."""
         raise HTTPException(status_code=404, detail="Project not found after creation")
     
     return created_project[0]
@@ -402,41 +401,107 @@ async def create_update(update: UpdateCreate, current_user: dict = Depends(get_c
         raise HTTPException(status_code=403, detail="Not authorized to create updates for this project")
 
     # Insert the new update
-    success = db.execute_update(
+    update_id = db.execute_insert(
         "INSERT INTO updates (project_id, user_id, content) VALUES (%s, %s, %s)",
         (update.project_id, current_user["user_id"], update.content)
     )
 
-    if not success:
+    if update_id is None:
         raise HTTPException(status_code=500, detail="Failed to create update")
 
     # Return the created update
     created_update = db.execute_query(
-        "SELECT * FROM updates WHERE project_id = %s AND user_id = %s AND content = %s",
-        (update.project_id, current_user["user_id"], update.content)
+        "SELECT * FROM updates WHERE update_id = %s",
+        (update_id,)
     )
 
     if not created_update or len(created_update) == 0:
-        """ This should never happen if the insert was successful, but we check just in case. """
         raise HTTPException(status_code=404, detail="Update not found after creation")
 
     return created_update[0]
 
 
-@app.get("/api/updates", response_model=list[UpdateResponse])
-async def get_all_updates():
-    """Fetch all updates for live feed."""
+@app.get("/api/updates")
+async def get_all_updates(current_user: dict = Depends(get_current_user)):
+    """Fetch all updates for live feed with enriched data (project info, comments, collaboration status)."""
     updates = db.execute_query(
         """SELECT * FROM updates WHERE is_deleted = 0 ORDER BY created_at DESC"""
     )
     
     if updates is None:
         updates = []
-    return updates
+    
+    # Enrich each update with project info, author info, comments, and collaboration status
+    enriched_updates = []
+    for update in updates:
+        # Get project info
+        project_data = db.execute_query(
+            "SELECT proj_id, title, user_id FROM projects WHERE proj_id = %s AND is_deleted = 0",
+            (update['project_id'],)
+        )
+        project = project_data[0] if project_data else None
+        
+        # Get author info
+        author = None
+        if update.get('user_id'):
+            author_data = db.execute_query(
+                "SELECT user_id, name, email, bio FROM users WHERE user_id = %s AND is_deleted = 0",
+                (update['user_id'],)
+            )
+            if author_data:
+                author = author_data[0]
+        
+        # Get project owner info
+        project_owner = None
+        if project and project.get('user_id'):
+            owner_data = db.execute_query(
+                "SELECT user_id, name FROM users WHERE user_id = %s AND is_deleted = 0",
+                (project['user_id'],)
+            )
+            if owner_data:
+                project_owner = owner_data[0]
+        
+        # Get comments
+        comments_data = db.execute_query(
+            """SELECT c.com_id, c.content, c.user_id, u.name, c.created_at 
+               FROM comment c 
+               JOIN users u ON c.user_id = u.user_id 
+               WHERE c.update_id = %s AND c.is_deleted = 0 
+               ORDER BY c.created_at ASC""",
+            (update['update_id'],)
+        )
+        comments = comments_data or []
+        
+        # Check collaboration request status for current user
+        collab_status = None
+        if project:
+            collab_req = db.execute_query(
+                """SELECT status FROM collaboration_request 
+                   WHERE project_id = %s AND user_id = %s AND is_deleted = 0""",
+                (project['proj_id'], current_user['user_id'])
+            )
+            if collab_req:
+                collab_status = collab_req[0]['status']
+        
+        enriched_updates.append({
+            'update_id': update['update_id'],
+            'project_id': update['project_id'],
+            'user_id': update['user_id'],
+            'content': update['content'],
+            'created_at': update['created_at'],
+            'author': author,
+            'project': project,
+            'project_owner': project_owner,
+            'comments': comments,
+            'collab_status': collab_status,
+            'is_owner': project and project['user_id'] == current_user['user_id']
+        })
+    
+    return enriched_updates
 
-@app.get("/api/projects/{proj_id}/updates", response_model=list[UpdateResponse])
+@app.get("/api/projects/{proj_id}/updates", response_model=list[dict])
 async def get_project_updates(proj_id: int):
-    """Fetch all updates for a specific project."""
+    """Fetch all updates for a specific project with nested comments and author info."""
     updates = db.execute_query(
         """SELECT * FROM updates WHERE project_id = %s AND is_deleted = 0 ORDER BY created_at DESC""",
         (proj_id,)
@@ -444,7 +509,59 @@ async def get_project_updates(proj_id: int):
     
     if updates is None:
         updates = []
-    return updates
+    
+    # Enrich each update with author info and comments
+    enriched_updates = []
+    for update in updates:
+        # Get author info
+        author = None
+        if update.get('user_id'):
+            author_data = db.execute_query(
+                "SELECT user_id, name, email, bio FROM users WHERE user_id = %s AND is_deleted = 0",
+                (update['user_id'],)
+            )
+            if author_data and len(author_data) > 0:
+                author = author_data[0]
+        
+        # Get comments for this update
+        comments_data = db.execute_query(
+            """SELECT * FROM comment WHERE update_id = %s AND is_deleted = 0 ORDER BY created_at ASC""",
+            (update['update_id'],)
+        )
+        
+        # Enrich comments with author info
+        comments = []
+        if comments_data:
+            for comment in comments_data:
+                comment_author = None
+                if comment.get('user_id'):
+                    comment_author_data = db.execute_query(
+                        "SELECT user_id, name FROM users WHERE user_id = %s AND is_deleted = 0",
+                        (comment['user_id'],)
+                    )
+                    if comment_author_data and len(comment_author_data) > 0:
+                        comment_author = comment_author_data[0]
+                
+                comments.append({
+                    'com_id': comment['com_id'],
+                    'update_id': comment['update_id'],
+                    'user_id': comment['user_id'],
+                    'content': comment['content'],
+                    'created_at': comment['created_at'],
+                    'author': comment_author
+                })
+        
+        enriched_updates.append({
+            'update_id': update['update_id'],
+            'project_id': update['project_id'],
+            'user_id': update['user_id'],
+            'content': update['content'],
+            'created_at': update['created_at'],
+            'author': author,
+            'comments': comments
+        })
+    
+    return enriched_updates
 
 @app.delete("/api/updates/{update_id}")
 async def delete_update(update_id: int, current_user: dict = Depends(get_current_user)):
@@ -489,7 +606,7 @@ async def create_comment(comment: CommentCreate,current_user: dict = Depends(get
         raise HTTPException(status_code=404, detail="Update not found")
 
     # Insert comment
-    success = db.execute_update(
+    com_id = db.execute_insert(
         """
         INSERT INTO comment (update_id, user_id, content)
         VALUES (%s, %s, %s)
@@ -497,10 +614,8 @@ async def create_comment(comment: CommentCreate,current_user: dict = Depends(get
         (comment.update_id, current_user["user_id"], comment.content)
     )
 
-    if not success:
+    if com_id is None:
         raise HTTPException(status_code=500, detail="Failed to create comment")
-
-    com_id = db.get_last_insert_id()
 
     created_comment = db.execute_query(
         "SELECT * FROM comment WHERE com_id = %s AND is_deleted = 0",
@@ -557,7 +672,7 @@ async def delete_comment(com_id: int, current_user: dict = Depends(get_current_u
 async def create_collaboration_request(collab: CollaborationCreate,current_user: dict = Depends(get_current_user)):
     # 1. Check project exists
     project = db.execute_query(
-        "SELECT * FROM project WHERE proj_id = %s AND is_deleted = 0",
+        "SELECT * FROM projects WHERE proj_id = %s AND is_deleted = 0",
         (collab.project_id,)
     )
 
@@ -581,7 +696,7 @@ async def create_collaboration_request(collab: CollaborationCreate,current_user:
         raise HTTPException(status_code=400, detail="Request already exists")
 
     # 4. Insert request
-    success = db.execute_update(
+    collab_id = db.execute_insert(
         """
         INSERT INTO collaboration_request (project_id, user_id, message)
         VALUES (%s, %s, %s)
@@ -589,10 +704,8 @@ async def create_collaboration_request(collab: CollaborationCreate,current_user:
         (collab.project_id, current_user["user_id"], collab.message)
     )
 
-    if not success:
+    if collab_id is None:
         raise HTTPException(status_code=500, detail="Failed to create request")
-
-    collab_id = db.get_last_insert_id()
 
     created = db.execute_query(
         "SELECT * FROM collaboration_request WHERE collab_id = %s",
@@ -604,7 +717,7 @@ async def create_collaboration_request(collab: CollaborationCreate,current_user:
 @app.get("/api/projects/{project_id}/collaborations", response_model=list[CollaborationResponse])
 async def get_project_collaborations(project_id: int,current_user: dict = Depends(get_current_user)):
     project = db.execute_query(
-        "SELECT * FROM project WHERE proj_id = %s AND is_deleted = 0",
+        "SELECT * FROM projects WHERE proj_id = %s AND is_deleted = 0",
         (project_id,)
     )
 
@@ -641,7 +754,7 @@ async def update_collaboration_status(collab_id: int,update: CollaborationUpdate
 
     # 2. Check project ownership
     project = db.execute_query(
-        "SELECT * FROM project WHERE proj_id = %s",
+        "SELECT * FROM projects WHERE proj_id = %s",
         (project_id,)
     )
 
@@ -668,22 +781,61 @@ async def update_collaboration_status(collab_id: int,update: CollaborationUpdate
 
     return updated[0]
 
-@app.get("/api/collaborations/me", response_model=list[CollaborationResponse])
+@app.get("/api/collaborations/me")
 async def get_my_collaborations(current_user: dict = Depends(get_current_user)):
-    """Fetch all collaboration requests for the current user."""
-    requests = db.execute_query(
+    """Fetch all collaboration requests - both outgoing (user requested) and incoming (projects they own)."""
+    
+    # 1. Outgoing: Requests the user has sent to projects
+    outgoing = db.execute_query(
         """
-        SELECT cr.*, p.title
+        SELECT 
+            cr.collab_id,
+            cr.project_id,
+            cr.user_id,
+            cr.message,
+            cr.status,
+            cr.created_at,
+            p.title as project_title,
+            u.name as project_owner_name,
+            'outgoing' as type
         FROM collaboration_request cr
-        JOIN project p ON cr.project_id = p.proj_id
+        JOIN projects p ON cr.project_id = p.proj_id
+        JOIN users u ON p.user_id = u.user_id
         WHERE cr.user_id = %s AND cr.is_deleted = 0
         ORDER BY cr.created_at DESC
         """,
         (current_user["user_id"],)
     )
-    if requests is None:
-        requests = []
-    return requests
+    
+    # 2. Incoming: Requests from others for projects the user owns
+    incoming = db.execute_query(
+        """
+        SELECT 
+            cr.collab_id,
+            cr.project_id,
+            cr.user_id,
+            cr.message,
+            cr.status,
+            cr.created_at,
+            p.title as project_title,
+            u.name as requester_name,
+            'incoming' as type
+        FROM collaboration_request cr
+        JOIN projects p ON cr.project_id = p.proj_id
+        JOIN users u ON cr.user_id = u.user_id
+        WHERE p.user_id = %s AND cr.is_deleted = 0
+        ORDER BY cr.created_at DESC
+        """,
+        (current_user["user_id"],)
+    )
+    
+    result = []
+    if outgoing:
+        result.extend(outgoing)
+    if incoming:
+        result.extend(incoming)
+    
+    return result or []
 
 
 # ============================================================================
@@ -692,7 +844,7 @@ async def get_my_collaborations(current_user: dict = Depends(get_current_user)):
 
 @app.get("/api/celebrations", response_model=list[CelebrationResponse])
 async def get_celebration_wall():
-    """Fetch recently completed projects for the celebration wall."""
+    """Fetch recently completed projects for the celebration wall with comments and collaborators."""
     
     celebrations = db.execute_query(
         """
@@ -704,7 +856,7 @@ async def get_celebration_wall():
             u.user_id,
             u.name,
             COUNT(up.update_id) AS total_updates
-        FROM project p
+        FROM projects p
         JOIN users u ON p.user_id = u.user_id
         LEFT JOIN updates up 
             ON up.project_id = p.proj_id 
@@ -720,4 +872,46 @@ async def get_celebration_wall():
     )
     if celebrations is None:
         celebrations = []
-    return celebrations
+    
+    # Enrich each celebration with comments and collaborators
+    enriched_celebrations = []
+    for celebration in celebrations:
+        proj_id = celebration['proj_id']
+        
+        # Fetch all comments from all updates for this project
+        comments_data = db.execute_query(
+            """
+            SELECT 
+                c.com_id,
+                c.content,
+                c.user_id,
+                u.name as author_name,
+                c.created_at
+            FROM comment c
+            JOIN updates up ON c.update_id = up.update_id
+            JOIN users u ON c.user_id = u.user_id
+            WHERE up.project_id = %s AND c.is_deleted = 0
+            ORDER BY c.created_at DESC
+            LIMIT 5
+            """,
+            (proj_id,)
+        )
+        
+        # Fetch all collaborators (accepted collaboration requests)
+        collaborators_data = db.execute_query(
+            """
+            SELECT DISTINCT
+                u.user_id,
+                u.name
+            FROM collaboration_request cr
+            JOIN users u ON cr.user_id = u.user_id
+            WHERE cr.project_id = %s AND cr.status = 'Accepted' AND cr.is_deleted = 0
+            """,
+            (proj_id,)
+        )
+        
+        celebration['comments'] = comments_data or []
+        celebration['collaborators'] = collaborators_data or []
+        enriched_celebrations.append(celebration)
+    
+    return enriched_celebrations

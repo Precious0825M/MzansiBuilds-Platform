@@ -45,6 +45,16 @@ export const api = {
     // Get current user
     getMe: () => request("/users/me"),
 
+    // Get any user by ID
+    getUser: (userId: number) => request(`/users/${userId}`),
+
+    // Update user profile
+    updateUser: (userId: number, data: { name?: string; bio?: string }) =>
+        request(`/users/${userId}`, {
+            method: "PUT",
+            body: JSON.stringify(data),
+        }),
+
     // Projects
 
     getProjects: () => request("/projects"),
@@ -55,7 +65,7 @@ export const api = {
         title: string;
         description: string;
         stage: string;
-        support_needed: string;
+        support_needed?: string | null;
     }) =>
         request("/projects", {
             method: "POST",
@@ -73,7 +83,13 @@ export const api = {
             method: "DELETE",
         }),
 
+    // Get projects by specific user
+    getProjectsByUser: (userId: number) =>
+        request(`/projects/user/${userId}`),
+
     // Updates 
+    getUpdates: () => request("/updates"),
+
     getProjectUpdates: (projectId: number) =>
         request(`/projects/${projectId}/updates`),
 
@@ -81,6 +97,11 @@ export const api = {
         request("/updates", {
             method: "POST",
             body: JSON.stringify(data),
+        }),
+
+    deleteUpdate: (updateId: number) =>
+        request(`/updates/${updateId}`, {
+            method: "DELETE",
         }),
 
     // Comments
@@ -93,6 +114,11 @@ export const api = {
             body: JSON.stringify(data),
         }),
 
+    deleteComment: (commentId: number) =>
+        request(`/comments/${commentId}`, {
+            method: "DELETE",
+        }),
+
     // Collab
     requestCollab: (data: { project_id: number; message: string }) =>
         request("/collaborations", {
@@ -101,6 +127,15 @@ export const api = {
         }),
 
     getMyCollabs: () => request("/collaborations/me"),
+
+    getProjectCollaborations: (projectId: number) =>
+        request(`/projects/${projectId}/collaborations`),
+
+    updateCollaborationStatus: (collabId: number, status: string) =>
+        request(`/collaborations/${collabId}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status }),
+        }),
 
     // celebration Wall
     getCelebrations: () => request("/celebrations"),

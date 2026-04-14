@@ -93,7 +93,7 @@ class DatabaseConfig:
             self.close_connection(connection)
 
     def execute_update(self, query: str, params: tuple = None) -> bool:
-        """Execute an INSERT, UPDATE, or DELETE statement."""
+        """Execute an INSERT, UPDATE, or DELETE statement. Returns True on success, False on failure."""
         connection = self.open_connection()
         cursor = connection.cursor(dictionary=True)
 
@@ -104,6 +104,27 @@ class DatabaseConfig:
         except Error as error:
             self.logger.error(f'Error executing update: {error}')
             return False
+
+        finally:
+            cursor.close()
+            self.close_connection(connection)
+
+    def execute_insert(self, query: str, params: tuple = None) -> Optional[int]:
+        """Execute an INSERT statement and return the last inserted ID."""
+        connection = self.open_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        try:
+            cursor.execute(query, params or ())
+            # For INSERT statements, get the last insert id from the same cursor
+            cursor.execute('SELECT LAST_INSERT_ID() AS last_id')
+            result = cursor.fetchone()
+            last_id = int(result['last_id']) if result and result['last_id'] is not None else None
+            return last_id
+
+        except Error as error:
+            self.logger.error(f'Error executing insert: {error}')
+            return None
 
         finally:
             cursor.close()
@@ -121,24 +142,6 @@ class DatabaseConfig:
         except Error as error:
             self.logger.error(f'Error executing batch: {error}')
             return False
-
-        finally:
-            cursor.close()
-            self.close_connection(connection)
-
-    def get_last_insert_id(self) -> Optional[int]:
-        """Return the last AUTO_INCREMENT value for the current session."""
-        connection = self.open_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        try:
-            cursor.execute('SELECT LAST_INSERT_ID() AS last_id')
-            result = cursor.fetchone()
-            return int(result['last_id']) if result and result['last_id'] is not None else None
-
-        except Error as error:
-            self.logger.error(f'Error getting last insert ID: {error}')
-            return None
 
         finally:
             cursor.close()
@@ -181,7 +184,15 @@ class DatabaseConfig:
             cursor.execute(f'USE `{self.database}`')
 
             if not self._all_schema_tables_exist(cursor):
-                self._create_tables(cursor)
+                try:
+                    self._create_tables(cursor)
+                except Error as table_error:
+                    # If table creation fails due to schema issues, drop and retry
+                    self.logger.warning(f'Schema creation failed: {table_error}, attempting recovery...')
+                    cursor.execute(f'DROP DATABASE IF EXISTS `{self.database}`')
+                    cursor.execute(f'CREATE DATABASE `{self.database}`')
+                    cursor.execute(f'USE `{self.database}`')
+                    self._create_tables(cursor)
             else:
                 self.logger.info('All required schema tables already exist.')
 
@@ -197,7 +208,7 @@ class DatabaseConfig:
         """Return True when all required application tables are present."""
         required_tables = [
             'users',
-            'project',
+            'projects',
             'updates',
             'comment',
             'collaboration_request',
@@ -232,7 +243,7 @@ class DatabaseConfig:
         ''')
 
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS project (
+            CREATE TABLE IF NOT EXISTS projects (
                 proj_id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 title VARCHAR(255) NOT NULL,
@@ -257,7 +268,7 @@ class DatabaseConfig:
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_updates_project_id (project_id),
                 INDEX idx_updates_user_id (user_id),
-                CONSTRAINT fk_update_project FOREIGN KEY (project_id) REFERENCES project(proj_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+                CONSTRAINT fk_update_project FOREIGN KEY (project_id) REFERENCES projects(proj_id) ON DELETE RESTRICT ON UPDATE CASCADE,
                 CONSTRAINT fk_update_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ''')
@@ -289,7 +300,7 @@ class DatabaseConfig:
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_collab_project_id (project_id),
                 INDEX idx_collab_user_id (user_id),
-                CONSTRAINT fk_collab_project FOREIGN KEY (project_id) REFERENCES project(proj_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+                CONSTRAINT fk_collab_project FOREIGN KEY (project_id) REFERENCES projects(proj_id) ON DELETE RESTRICT ON UPDATE CASCADE,
                 CONSTRAINT fk_collab_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ''')

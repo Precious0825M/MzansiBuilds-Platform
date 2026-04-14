@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
-import '../styles/auth.css'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -28,18 +27,18 @@ export default function Login() {
     }
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
+        <div className="min-h-screen flex items-center justify-center bg-green-50 px-5 font-system">
+            <div className="w-full max-w-md bg-white rounded-3xl p-8 border border-gray-300 shadow-lg">
 
-                <div className="auth-logo">
-                    <h1> DevLog</h1>
-                    <p>Build in public. Ship together.</p>
+                <div className="text-center mb-7">
+                    <h1 className="text-2xl font-black text-gray-900">MzansBuilds</h1>
+                    <p className="text-sm text-gray-500 mt-1">Build in public. Ship together.</p>
                 </div>
 
-                <h2 className="auth-title">Login</h2>
-                <form onSubmit={handleLogin} className="auth-form">
+                <h2 className="text-lg font-bold text-gray-900 mb-5">Login</h2>
+                <form onSubmit={handleLogin} className="flex flex-col gap-3.5">
                     <input
-                        className="auth-input"
+                        className="w-full px-3.5 py-3 rounded-2xl border border-gray-300 bg-gray-50 text-gray-900 text-sm outline-none transition-colors focus:border-green-600 focus:bg-white"
                         type="email"
                         placeholder="Email"
                         value={email}
@@ -48,7 +47,7 @@ export default function Login() {
                     />
 
                     <input
-                        className="auth-input"
+                        className="w-full px-3.5 py-3 rounded-2xl border border-gray-300 bg-gray-50 text-gray-900 text-sm outline-none transition-colors focus:border-green-600 focus:bg-white"
                         type="password"
                         placeholder="Password"
                         value={password}
@@ -56,18 +55,18 @@ export default function Login() {
                         required
                     />
 
-                    <button className="auth-btn" type="submit">
+                    <button className="w-full px-3.5 py-3 rounded-2xl bg-green-600 border-2 border-green-600 text-white font-semibold text-sm cursor-pointer transition-colors hover:bg-green-700" type="submit">
                         Login →
                     </button>
                 </form>
 
-                {error && <p className="auth-error">{error}</p>}
+                {error && <p className="text-red-500 text-xs mt-1.5 mb-2.5">{error}</p>}
 
                 <p
-                    className="auth-switch"
+                    className="mt-4 text-sm text-center text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
                     onClick={() => navigate('/register')}
                 >
-                    Don’t have an account? <span>Register</span>
+                    Don't have an account? <span className="font-semibold">Register</span>
                 </p>
             </div>
         </div>
