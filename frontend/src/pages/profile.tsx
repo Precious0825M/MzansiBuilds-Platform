@@ -91,10 +91,13 @@ export default function Profile() {
                         <div className="flex-1">
                             {editMode ? (
                                 <div className="space-y-3">
+                                    <label htmlFor="name-input" className="sr-only">Name</label>
                                     <input
+                                        id="name-input"
                                         type="text"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
+                                        placeholder="Enter your name"
                                         className="w-full px-4 py-2 rounded-2xl border border-gray-300 bg-gray-50 text-gray-900 font-bold text-2xl outline-none transition-colors focus:border-green-600 focus:bg-white"
                                     />
                                     <textarea
