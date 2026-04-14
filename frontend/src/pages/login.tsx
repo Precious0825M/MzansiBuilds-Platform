@@ -32,7 +32,7 @@ export default function Login() {
 
                 <div className="text-center mb-7">
                     <h1 className="text-2xl font-black text-gray-900"> MzansiBuilds</h1>
-                    <p className="text-sm text-gray-500 mt-1">Build in public. Ship together.</p>
+                    q                    <p className="text-sm text-gray-500 mt-1">Build in public. Ship together.</p>
                 </div>
 
                 <h2 className="text-lg font-bold text-gray-900 mb-5">Login</h2>
