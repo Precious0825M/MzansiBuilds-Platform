@@ -31,7 +31,7 @@ export default function Login() {
             <div className="w-full max-w-md bg-white rounded-3xl p-8 border border-gray-300 shadow-lg">
 
                 <div className="text-center mb-7">
-                    <h1 className="text-2xl font-black text-gray-900">MzansBuilds</h1>
+                    <h1 className="text-2xl font-black text-gray-900">MzansiBuilds</h1>
                     <p className="text-sm text-gray-500 mt-1">Build in public. Ship together.</p>
                 </div>
 
