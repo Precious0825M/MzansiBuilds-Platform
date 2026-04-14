@@ -92,7 +92,7 @@ MzansiBuilds-Platform/
 ```bash
 cd backend
 pip install -r requirements.txt
-python app/run.py
+uvicorn app.main:app --reload --port 8000
 ```
 
 ### Frontend Setup
